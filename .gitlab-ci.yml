@@ -1,0 +1,93 @@
+# GitLab CI/CD Pipeline
+#
+# Флоу работы:
+# 1. При каждом пуше:
+#    - Быстрая проверка линтером (quick-lint)
+#
+# 2. При пуше в main/develop или создании MR:
+#    - Установка зависимостей (install)
+#    - Сборка проекта (build)
+#
+# 3. Только при пуше в main:
+#    - Деплой на Vercel (deploy)
+#
+# Кэширование:
+# - node_modules и .npm-cache кэшируются для ускорения сборок
+# - Ключ кэша зависит от ветки
+
+image: node:18-alpine
+
+stages:
+  - quick-lint
+  - install
+  - build
+  - deploy
+
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+    - .npm-cache/
+
+# Правила запуска пайплайна
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+    - if: $CI_COMMIT_BRANCH == "develop"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - when: never
+
+# Быстрая проверка линтером при каждом пуше
+quick-lint:
+  stage: quick-lint
+  script:
+    - npm ci
+    - npm run lint
+  rules:
+    - when: always
+
+# Установка зависимостей
+install:
+  stage: install
+  script:
+    - npm ci
+  artifacts:
+    paths:
+      - node_modules/
+
+# Сборка проекта
+build:
+  stage: build
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+    expire_in: 1 week
+  dependencies:
+    - install
+
+# Деплой на Vercel
+deploy:
+  stage: deploy
+  image: node:18-alpine
+  script:
+    - npm install -g vercel
+    - vercel --token $VERCEL_TOKEN --prod
+  dependencies:
+    - build
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"
+
+# Уведомления в Slack
+notify:
+  stage: .post
+  script:
+    - |
+      if [ $CI_PIPELINE_STATUS = "success" ]; then
+        curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"✅ Pipeline успешно выполнен в ветке $CI_COMMIT_BRANCH\"}" $SLACK_WEBHOOK_URL
+      else
+        curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"❌ Pipeline завершился с ошибкой в ветке $CI_COMMIT_BRANCH\"}" $SLACK_WEBHOOK_URL
+      fi
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main"

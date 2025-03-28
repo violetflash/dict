@@ -1,16 +1,14 @@
 # GitLab CI/CD Pipeline
 #
 # Флоу работы:
-# 1. При каждом пуше:
-#    - Быстрая проверка линтером (quick-lint)
+# 1. При создании/обновлении MR в develop:
+#    - Проверка линтером
+#    - Установка зависимостей
+#    - Сборка проекта
 #
-# 2. При пуше в main/develop или создании MR:
-#    - Установка зависимостей (install)
-#    - Сборка проекта (build)
-#
-# 3. Только при пуше в main:
-#    - Деплой на Vercel (deploy) - временно отключен
-#    - Уведомления в Slack - временно отключены
+# 2. При создании/обновлении MR в main:
+#    - Все проверки как в develop
+#    - Деплой на Vercel (временно отключен)
 #
 # Кэширование:
 # - node_modules и .npm-cache кэшируются для ускорения сборок
@@ -34,20 +32,20 @@ cache:
 # Правила запуска пайплайна
 workflow:
   rules:
-    - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_COMMIT_BRANCH == "develop"
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # Запускать только при создании/обновлении MR в develop
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
+    # Или при создании/обновлении MR в main
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+    # Отключаем для всех остальных случаев
     - when: never
 
-# Быстрая проверка линтером при каждом пуше
+# Проверка линтером
 quick-lint:
   stage: quick-lint
   script:
     - npm install -g pnpm
     - pnpm install
     - pnpm run lint
-  rules:
-    - when: always
 
 # Установка зависимостей
 install:
@@ -83,7 +81,7 @@ build:
 #   dependencies:
 #     - build
 #   rules:
-#     - if: $CI_COMMIT_BRANCH == "main"
+#     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
 
 # Уведомления в Slack (временно отключены)
 # notify:
@@ -96,4 +94,4 @@ build:
 #         curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"❌ Pipeline завершился с ошибкой в ветке $CI_COMMIT_BRANCH\"}" $SLACK_WEBHOOK_URL
 #       fi
 #   rules:
-#     - if: $CI_COMMIT_BRANCH == "main"
+#     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"

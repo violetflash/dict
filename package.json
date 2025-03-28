@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "type-check": "tsc --noEmit $(git diff --name-only HEAD~1 | grep -E '\\.tsx?$')",
     "format": "prettier --write .",
     "prepare": "husky install"
   },

@@ -9,7 +9,11 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit $(git diff --name-only HEAD~1 | grep -E '\\.tsx?$')",
     "format": "prettier --write .",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "linear:create": "linear create",
+    "linear:branch": "linear create-branch",
+    "linear:list": "linear list",
+    "linear:view": "linear view"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",

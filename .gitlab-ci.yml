@@ -16,6 +16,10 @@
 
 image: node:18-alpine
 
+variables:
+  NODE_VERSION: '20.11.1'
+  LINEAR_ACCESS_TOKEN: ${LINEAR_ACCESS_TOKEN}
+
 stages:
   - quick-lint
   - install

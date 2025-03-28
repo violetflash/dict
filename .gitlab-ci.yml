@@ -9,7 +9,8 @@
 #    - Сборка проекта (build)
 #
 # 3. Только при пуше в main:
-#    - Деплой на Vercel (deploy)
+#    - Деплой на Vercel (deploy) - временно отключен
+#    - Уведомления в Slack - временно отключены
 #
 # Кэширование:
 # - node_modules и .npm-cache кэшируются для ускорения сборок
@@ -21,7 +22,8 @@ stages:
   - quick-lint
   - install
   - build
-  - deploy
+  # - deploy # Временно отключен
+  # - .post # Временно отключен
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
@@ -69,30 +71,29 @@ build:
     expire_in: 1 week
   dependencies:
     - install
+# Деплой на Vercel (временно отключен)
+# deploy:
+#   stage: deploy
+#   image: node:18-alpine
+#   script:
+#     - npm install -g pnpm
+#     - npm install -g vercel
+#     - pnpm install
+#     - vercel --token $VERCEL_TOKEN --prod
+#   dependencies:
+#     - build
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == "main"
 
-# Деплой на Vercel
-deploy:
-  stage: deploy
-  image: node:18-alpine
-  script:
-    - npm install -g pnpm
-    - npm install -g vercel
-    - pnpm install
-    - vercel --token $VERCEL_TOKEN --prod
-  dependencies:
-    - build
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
-
-# Уведомления в Slack
-notify:
-  stage: .post
-  script:
-    - |
-      if [ $CI_PIPELINE_STATUS = "success" ]; then
-        curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"✅ Pipeline успешно выполнен в ветке $CI_COMMIT_BRANCH\"}" $SLACK_WEBHOOK_URL
-      else
-        curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"❌ Pipeline завершился с ошибкой в ветке $CI_COMMIT_BRANCH\"}" $SLACK_WEBHOOK_URL
-      fi
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
+# Уведомления в Slack (временно отключены)
+# notify:
+#   stage: .post
+#   script:
+#     - |
+#       if [ $CI_PIPELINE_STATUS = "success" ]; then
+#         curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"✅ Pipeline успешно выполнен в ветке $CI_COMMIT_BRANCH\"}" $SLACK_WEBHOOK_URL
+#       else
+#         curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"❌ Pipeline завершился с ошибкой в ветке $CI_COMMIT_BRANCH\"}" $SLACK_WEBHOOK_URL
+#       fi
+#   rules:
+#     - if: $CI_COMMIT_BRANCH == "main"

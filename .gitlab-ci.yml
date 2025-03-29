@@ -90,7 +90,14 @@ mirror-to-github:
       if [ -n "${GITHUB_TOKEN}" ]; then
         echo "Token is present"
         git remote add github "https://${GITHUB_TOKEN}@github.com/violetflash/dict.git"
-        git push --mirror github
+        # Получаем все ветки
+        git fetch origin --prune
+        # Пушим основные ветки
+        git push github refs/remotes/origin/main:refs/heads/main
+        git push github refs/remotes/origin/develop:refs/heads/develop
+        # Пушим текущую ветку MR
+        echo "Pushing current branch: $CI_COMMIT_REF_NAME"
+        git push github "refs/remotes/origin/$CI_COMMIT_REF_NAME:refs/heads/$CI_COMMIT_REF_NAME"
       else
         echo "Error: GITHUB_TOKEN is not set"
         exit 1

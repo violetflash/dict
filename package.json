@@ -9,7 +9,17 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit $(git diff --name-only HEAD~1 | grep -E '\\.tsx?$')",
     "format": "prettier --write .",
-    "prepare": "husky install"
+    "postinstall": "husky",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,css,md}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",

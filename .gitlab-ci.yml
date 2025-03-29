@@ -85,18 +85,27 @@ mirror-to-github:
     - apk add --no-cache git
     - git config --global user.name "GitLab CI"
     - git config --global user.email "gitlab-ci@your-domain.com"
-    - echo "Setting up GitHub remote..."
+    # Настраиваем GIT_ASKPASS для безопасной передачи токена
     - |
       if [ -n "${GITHUB_TOKEN}" ]; then
         echo "Token is present"
-        # Клонируем репозиторий полностью
+        # Создаем временный скрипт для передачи токена
+        echo '#!/bin/sh' > git-askpass
+        echo "echo \$GITHUB_TOKEN" >> git-askpass
+        chmod +x git-askpass
+        export GIT_ASKPASS="./git-askpass"
+        
+        # Клонируем репозиторий
         git clone --mirror https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/dictionary-app-42/dict-fe.git
         cd dict-fe.git
-        # Добавляем GitHub remote
-        git remote add github "https://${GITHUB_TOKEN}@github.com/violetflash/dict.git"
-        # Пушим все изменения с force
+        
+        # Добавляем GitHub remote и пушим
+        git remote add github "https://violetflash@github.com/violetflash/dict.git"
         git push -f github --all
         git push -f github --tags
+        
+        # Удаляем временный скрипт
+        rm git-askpass
       else
         echo "Error: GITHUB_TOKEN is not set"
         exit 1

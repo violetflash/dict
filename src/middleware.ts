@@ -16,7 +16,8 @@ import type { NextRequest } from 'next/server';
  * - Статические файлы (/_next/static/*, /_next/image/*)
  * - Favicon
  */
-export function middleware(_request: NextRequest) {
+export function middleware(request: NextRequest) {
+  console.log('middleware', request.nextUrl.pathname);
   // Временно пропускаем все запросы для тестирования
   return NextResponse.next();
 

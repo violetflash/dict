@@ -19,7 +19,7 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const isAuthenticated = request.cookies.has('auth-token');
   const isHomePage = request.nextUrl.pathname === '/';
-  const isDevMode = process.env.NODE_ENV === 'development';
+  // const isDevMode = process.env.NODE_ENV === 'development';
   const isDevAuth = request.nextUrl.searchParams.get('dev-auth') === 'true';
 
   // В dev-режиме можно обойти гвард через URL-параметр

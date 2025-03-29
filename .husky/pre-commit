@@ -1,5 +1,17 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-# Запускаем lint-staged для проверки измененных файлов
+# Проверяем имя ветки
+. "$(dirname "$0")/check-branch-name"
+
+# Проверяем типы TypeScript только для измененных файлов
+pnpm type-check
+
+# Форматируем и проверяем измененные файлы
 pnpm lint-staged
+
+# # Проверяем сборку
+# pnpm build
+
+# # Проверяем зависимости
+# pnpm install

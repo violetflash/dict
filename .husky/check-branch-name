@@ -1,0 +1,21 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Получаем текущее имя ветки
+BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+
+# Проверяем, не main ли это или develop
+if [ "$BRANCH_NAME" = "main" ] || [ "$BRANCH_NAME" = "develop" ]; then
+  exit 0
+fi
+
+# Проверяем формат имени ветки
+if ! echo "$BRANCH_NAME" | grep -qE '^(feature|bugfix|hotfix|release)/[a-z0-9-]+$|^rc-[0-9]+v$'; then
+  echo "❌ Неверный формат имени ветки: $BRANCH_NAME"
+  echo "Используйте формат: type/description или rc-#v"
+  echo "Типы: feature, bugfix, hotfix, release"
+  echo "Примеры: feature/add-word-form, rc-1v"
+  exit 1
+fi
+
+exit 0 

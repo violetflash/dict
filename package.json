@@ -9,7 +9,11 @@
     "lint": "next lint",
     "type-check": "tsc --noEmit $(git diff --name-only HEAD~1 | grep -E '\\.tsx?$')",
     "format": "prettier --write .",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "linear:create": "linear create",
+    "linear:branch": "linear create-branch",
+    "linear:list": "linear list",
+    "linear:view": "linear view"
   },
   "dependencies": {
     "@hookform/resolvers": "^4.1.3",
@@ -25,14 +29,14 @@
     "zustand": "^5.0.3"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@eslint/eslintrc": "^3.3.1",
+    "@tailwindcss/postcss": "^4.0.17",
+    "@types/node": "^22.13.14",
+    "@types/react": "^19.0.12",
+    "@types/react-dom": "^19.0.4",
     "@typescript-eslint/eslint-plugin": "^8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
-    "eslint": "^9",
+    "eslint": "^9.23.0",
     "eslint-config-next": "15.2.4",
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.5",
@@ -41,7 +45,7 @@
     "husky": "^9.1.7",
     "lint-staged": "^15.5.0",
     "prettier": "^3.5.3",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "tailwindcss": "^4.0.17",
+    "typescript": "^5.8.2"
   }
 }

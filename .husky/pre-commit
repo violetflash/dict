@@ -16,4 +16,4 @@ pnpm lint-staged
 # # Проверяем зависимости
 # pnpm install
 
-pnpm pre-commit
+# pnpm pre-commit

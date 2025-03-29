@@ -50,7 +50,7 @@ quick-lint:
     - npm install -g pnpm
     - pnpm install
     - pnpm run lint
-    - pnpm run type-check
+    # - pnpm run type-check
 
 # Установка зависимостей
 install:

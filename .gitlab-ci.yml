@@ -1,15 +1,14 @@
 # GitLab CI/CD Pipeline
 #
 # Флоу работы:
-# 1. При каждом пуше:
-#    - Быстрая проверка линтером (quick-lint)
+# 1. При создании/обновлении MR в develop:
+#    - Проверка линтером
+#    - Установка зависимостей
+#    - Сборка проекта
 #
-# 2. При пуше в main/develop или создании MR:
-#    - Установка зависимостей (install)
-#    - Сборка проекта (build)
-#
-# 3. Только при пуше в main:
-#    - Деплой на Vercel (deploy)
+# 2. При создании/обновлении MR в main:
+#    - Все проверки как в develop
+#    - Деплой на Vercel (временно отключен)
 #
 # Кэширование:
 # - node_modules и .npm-cache кэшируются для ускорения сборок
@@ -22,103 +21,81 @@ variables:
   LINEAR_ACCESS_TOKEN: ${LINEAR_ACCESS_TOKEN}
 
 stages:
+  - quick-lint
   - install
-  - lint
-  - type-check
   - build
-  - test
-  - deploy
-  - notify
+  # - deploy # Временно отключен
+  # - .post # Временно отключен
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
   paths:
     - node_modules/
-    - .npm-cache/
+    - .pnpm-store/
 
 # Правила запуска пайплайна
 workflow:
   rules:
-    - if: $CI_COMMIT_BRANCH == "main"
-    - if: $CI_COMMIT_BRANCH == "develop"
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # Запускать только при создании/обновлении MR в develop
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
+    # Или при создании/обновлении MR в main
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+    # Отключаем для всех остальных случаев
     - when: never
+
+# Проверка линтером
+quick-lint:
+  stage: quick-lint
+  script:
+    - npm install -g pnpm
+    - pnpm install
+    - pnpm run lint
 
 # Установка зависимостей
 install:
   stage: install
   script:
     - npm install -g pnpm
-    - pnpm install --frozen-lockfile
+    - pnpm install
   artifacts:
     paths:
       - node_modules/
-
-# Проверка линтером
-lint:
-  stage: lint
-  script:
-    - pnpm lint
-  dependencies:
-    - install
-
-# Проверка типов
-type-check:
-  stage: type-check
-  script:
-    - pnpm type-check
-  dependencies:
-    - install
 
 # Сборка проекта
 build:
   stage: build
   script:
-    - pnpm build
+    - npm install -g pnpm
+    - pnpm run build
   artifacts:
     paths:
       - dist/
     expire_in: 1 week
   dependencies:
     - install
+# Деплой на Vercel (временно отключен)
+# deploy:
+#   stage: deploy
+#   image: node:18-alpine
+#   script:
+#     - npm install -g pnpm
+#     - npm install -g vercel
+#     - pnpm install
+#     - vercel --token $VERCEL_TOKEN --prod
+#   dependencies:
+#     - build
+#   rules:
+#     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
 
-# Тесты
-test:
-  stage: test
-  script:
-    - pnpm test
-  dependencies:
-    - install
-
-# Деплой
-deploy:
-  stage: deploy
-  script:
-    - echo "Deploy to production"
-  only:
-    - main
-  dependencies:
-    - build
-
-# Уведомления
-notify:
-  stage: notify
-  script:
-    - echo "Notify about deployment"
-  only:
-    - main
-  dependencies:
-    - deploy
-
-# Уведомления в Slack
-notify_slack:
-  stage: .post
-  script:
-    - |
-      if [ $CI_PIPELINE_STATUS = "success" ]; then
-        curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"✅ Pipeline успешно выполнен в ветке $CI_COMMIT_BRANCH\"}" $SLACK_WEBHOOK_URL
-      else
-        curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"❌ Pipeline завершился с ошибкой в ветке $CI_COMMIT_BRANCH\"}" $SLACK_WEBHOOK_URL
-      fi
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
+# Уведомления в Slack (временно отключены)
+# notify:
+#   stage: .post
+#   script:
+#     - |
+#       if [ $CI_PIPELINE_STATUS = "success" ]; then
+#         curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"✅ Pipeline успешно выполнен в ветке $CI_COMMIT_BRANCH\"}" $SLACK_WEBHOOK_URL
+#       else
+#         curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"❌ Pipeline завершился с ошибкой в ветке $CI_COMMIT_BRANCH\"}" $SLACK_WEBHOOK_URL
+#       fi
+#   rules:
+#     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"

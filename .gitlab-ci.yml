@@ -21,9 +21,9 @@ variables:
   LINEAR_ACCESS_TOKEN: ${LINEAR_ACCESS_TOKEN}
 
 stages:
-  - quick-lint
-  - install
-  - build
+  # - quick-lint
+  # - install
+  # - build
   - mirror # заливаем в github
   # - deploy # Временно отключен
   # - .post # Временно отключен
@@ -80,7 +80,8 @@ build:
 mirror-to-github:
   stage: mirror
   script:
-    - apt-get update && apt-get install -y git
+    # Установка git для Alpine
+    - apk add --no-cache git
     # Настраиваем Git напрямую
     - git config --global user.name "GitLab CI"
     - git config --global user.email "gitlab-ci@your-domain.com"

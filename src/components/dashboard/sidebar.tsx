@@ -15,7 +15,6 @@ import { Button } from '@/components/ui/button';
 import { useState } from 'react';
 import { Sheet, SheetContent, SheetTrigger } from '../ui/sheet';
 import { UserAvatar } from './user-avatar';
-import { useAuthStore } from '@/store/auth-store';
 import { useDevLink } from '@/hooks/use-dev-link';
 
 const navigation = [

@@ -82,9 +82,17 @@ mirror-to-github:
     - apk add --no-cache git
     - git config --global user.name "GitLab CI"
     - git config --global user.email "gitlab-ci@your-domain.com"
-    # Используем только токен
-    - 'git remote add github "https://${GITHUB_TOKEN}@github.com/violetflash/dict.git"'
-    - git push --mirror github
+    # Добавляем отладку и меняем формат команды
+    - echo "Setting up GitHub remote..."
+    - |
+      if [ -n "${GITHUB_TOKEN}" ]; then
+        echo "Token is present"
+        git remote add github "https://${GITHUB_TOKEN}@github.com/violetflash/dict.git"
+        git push --mirror github
+      else
+        echo "Error: GITHUB_TOKEN is not set"
+        exit 1
+      fi
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
       when: always

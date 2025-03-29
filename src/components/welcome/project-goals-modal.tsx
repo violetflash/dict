@@ -22,7 +22,7 @@ export function ProjectGoalsModal() {
       setOpen(true);
       localStorage.setItem('projectGoalsShown', 'true');
     } else {
-      //   setOpen(true);
+      setOpen(true);
       setHasSeenBefore(true);
     }
   }, []);

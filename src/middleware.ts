@@ -16,31 +16,31 @@ import type { NextRequest } from 'next/server';
  * - Статические файлы (/_next/static/*, /_next/image/*)
  * - Favicon
  */
-export function middleware(request: NextRequest) {
-  const isAuthenticated = request.cookies.has('auth-token');
-  const isHomePage = request.nextUrl.pathname === '/';
-  // const isDevMode = process.env.NODE_ENV === 'development';
-  const isDevAuth = request.nextUrl.searchParams.get('dev-auth') === 'true';
-
-  // В dev-режиме можно обойти гвард через URL-параметр
-  if (
-    // isDevMode &&
-    isDevAuth
-  ) {
-    return NextResponse.next();
-  }
-
-  // Разрешаем доступ к главной странице
-  if (isHomePage) {
-    return NextResponse.next();
-  }
-
-  // Защищаем все остальные роуты
-  if (!isAuthenticated) {
-    return NextResponse.redirect(new URL('/', request.url));
-  }
-
+export function middleware(_request: NextRequest) {
+  // Временно пропускаем все запросы для тестирования
   return NextResponse.next();
+
+  // const isAuthenticated = request.cookies.has('auth-token');
+  // const isHomePage = request.nextUrl.pathname === '/';
+  // const isDevMode = process.env.NODE_ENV === 'development';
+  // const isDevAuth = request.nextUrl.searchParams.get('dev-auth') === 'true';
+
+  // // В dev-режиме можно обойти гвард через URL-параметр
+  // if (isDevMode && isDevAuth) {
+  //   return NextResponse.next();
+  // }
+
+  // // Разрешаем доступ к главной странице
+  // if (isHomePage) {
+  //   return NextResponse.next();
+  // }
+
+  // // Защищаем все остальные роуты
+  // if (!isAuthenticated) {
+  //   return NextResponse.redirect(new URL('/', request.url));
+  // }
+
+  // return NextResponse.next();
 }
 
 /**

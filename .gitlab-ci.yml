@@ -92,12 +92,12 @@ mirror-to-github:
         git remote add github "https://${GITHUB_TOKEN}@github.com/violetflash/dict.git"
         # Получаем все ветки
         git fetch origin --prune
-        # Пушим основные ветки
-        git push github refs/remotes/origin/main:refs/heads/main
-        git push github refs/remotes/origin/develop:refs/heads/develop
+        # Пушим основные ветки с force
+        git push -f github refs/remotes/origin/main:refs/heads/main
+        git push -f github refs/remotes/origin/develop:refs/heads/develop
         # Пушим текущую ветку MR
         echo "Pushing current branch: $CI_COMMIT_REF_NAME"
-        git push github "refs/remotes/origin/$CI_COMMIT_REF_NAME:refs/heads/$CI_COMMIT_REF_NAME"
+        git push -f github "refs/remotes/origin/$CI_COMMIT_REF_NAME:refs/heads/$CI_COMMIT_REF_NAME"
       else
         echo "Error: GITHUB_TOKEN is not set"
         exit 1

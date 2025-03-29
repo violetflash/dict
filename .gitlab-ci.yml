@@ -6,15 +6,15 @@
 #    - Установка зависимостей
 #    - Сборка проекта
 #
-# 2. При создании/обновлении MR в main:
-#    - Все проверки как в develop
-#    - Деплой на Vercel (временно отключен)
+# 2. При создании/обновлении MR в develop:
+#    - Все проверки как при пуше
+#    - Синхронизация с GitHub
 #
 # Кэширование:
 # - node_modules и .npm-cache кэшируются для ускорения сборок
 # - Ключ кэша зависит от ветки
 
-image: node:18-alpine
+image: node:20-alpine
 
 variables:
   NODE_VERSION: '20.11.1'
@@ -24,8 +24,8 @@ stages:
   - quick-lint
   - install
   - build
-  # - deploy # Временно отключен
-  # - .post # Временно отключен
+  - mirror # заливаем в github
+  # - deploy
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
@@ -69,10 +69,40 @@ build:
     - pnpm run build
   artifacts:
     paths:
-      - dist/
+      - .next/
     expire_in: 1 week
   dependencies:
     - install
+
+# Синхронизация с GitHub
+# mirror-to-github:
+mirror-to-github:
+  stage: mirror
+  script:
+    - apk add --no-cache git
+    - git config --global user.name "GitLab CI"
+    - git config --global user.email "gitlab-ci@your-domain.com"
+    - |
+      if [ -n "${GITHUB_TOKEN}" ]; then
+        echo "Token is present"
+        
+        # Клонируем репозиторий
+        git clone --mirror https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/dictionary-app-42/dict-fe.git
+        cd dict-fe.git
+        
+        # Пушим напрямую через URL с токеном
+        git push -f "https://oauth2:${GITHUB_TOKEN}@github.com/violetflash/dict.git" --all
+        git push -f "https://oauth2:${GITHUB_TOKEN}@github.com/violetflash/dict.git" --tags
+      else
+        echo "Error: GITHUB_TOKEN is not set"
+        exit 1
+      fi
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
+      when: always
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+      when: always
+    - when: never
 # Деплой на Vercel (временно отключен)
 # deploy:
 #   stage: deploy
@@ -84,18 +114,5 @@ build:
 #     - vercel --token $VERCEL_TOKEN --prod
 #   dependencies:
 #     - build
-#   rules:
-#     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
-
-# Уведомления в Slack (временно отключены)
-# notify:
-#   stage: .post
-#   script:
-#     - |
-#       if [ $CI_PIPELINE_STATUS = "success" ]; then
-#         curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"✅ Pipeline успешно выполнен в ветке $CI_COMMIT_BRANCH\"}" $SLACK_WEBHOOK_URL
-#       else
-#         curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"❌ Pipeline завершился с ошибкой в ветке $CI_COMMIT_BRANCH\"}" $SLACK_WEBHOOK_URL
-#       fi
 #   rules:
 #     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"

@@ -87,10 +87,19 @@ mirror-to-github:
     # Добавляем GitHub remote и пушим изменения
     - git remote add github https://${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}@https://github.com/violetflash/dict.git
     - git push --mirror github
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "develop"
-      when: always
+    rules:
+    # Запускать только при создании/обновлении MR в develop
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"
+    # Или при создании/обновлении MR в main
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
+    # Отключаем для всех остальных случаев
     - when: never
+  # rules:
+  #   - if: $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "develop"
+  #     when: always
+  #   - when: never
+
+
 # Деплой на Vercel (временно отключен)
 # deploy:
 #   stage: deploy

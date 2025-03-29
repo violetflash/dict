@@ -84,7 +84,8 @@ mirror-to-github:
     - git config --global user.email "gitlab-ci@your-domain.com"
     # Изменен формат URL с токеном
     # - 'git remote add github "https://oauth2:${GITHUB_TOKEN}@github.com/violetflash/dict.git"'
-    - git remote add github https://${GITHUB_TOKEN}@github.com/violetflash/dict.git
+    # - git remote add github https://${GITHUB_TOKEN}@github.com/violetflash/dict.git
+    - 'git remote add github "https://${GITHUB_TOKEN}:x-oauth-basic@github.com/violetflash/dict.git"'
     - git push --mirror github
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "develop"

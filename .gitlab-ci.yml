@@ -78,11 +78,12 @@ workflow:
 # Синхронизация с GitHub
 mirror-to-github:
   stage: mirror
+  variables:
+    GITHUB_TOKEN: ${GITHUB_TOKEN}
   script:
     - apk add --no-cache git
     - git config --global user.name "GitLab CI"
     - git config --global user.email "gitlab-ci@your-domain.com"
-    # Добавляем отладку и меняем формат команды
     - echo "Setting up GitHub remote..."
     - |
       if [ -n "${GITHUB_TOKEN}" ]; then

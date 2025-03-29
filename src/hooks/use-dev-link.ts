@@ -43,6 +43,7 @@ export function useDevLink() {
         router.push(href);
       }
     } catch (error) {
+      console.error('Error pushing link:', error);
       // В случае ошибки просто переходим по ссылке
       router.push(href);
     }

@@ -30,12 +30,12 @@ const bottomNavigation = [
   { name: 'На главную', href: '/', icon: Home },
 ];
 
-export function Sidebar() {
+// Компонент для отображения элементов навигации
+function NavItems({ setIsOpen }: { setIsOpen?: (value: boolean) => void }) {
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
   const { handleLink } = useDevLink();
 
-  const NavItems = () => (
+  return (
     <>
       <div className="flex h-16 items-center justify-between border-b px-6">
         <Button
@@ -46,9 +46,6 @@ export function Sidebar() {
           <BookOpen className="h-6 w-6" />
           <span>Dictionary</span>
         </Button>
-        <div className="md:hidden">
-          <UserAvatar />
-        </div>
       </div>
 
       <nav className="flex-1 space-y-1 px-3 py-4">
@@ -64,7 +61,7 @@ export function Sidebar() {
               )}
               onClick={() => {
                 handleLink(item.href);
-                setIsOpen(false);
+                setIsOpen?.(false);
               }}
             >
               <item.icon className="h-5 w-5" />
@@ -90,7 +87,7 @@ export function Sidebar() {
               )}
               onClick={() => {
                 handleLink(item.href);
-                setIsOpen(false);
+                setIsOpen?.(false);
               }}
             >
               <item.icon className="h-5 w-5" />
@@ -101,30 +98,45 @@ export function Sidebar() {
       </div>
     </>
   );
+}
+
+// Мобильная навигация
+function MobileNav() {
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <>
-      {/* Мобильное меню */}
-      <div className="md:hidden">
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetTrigger asChild>
-            <Button variant="ghost" size="icon" className="md:hidden">
-              <Menu className="h-6 w-6" />
-              <span className="sr-only">Открыть меню</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-64 p-0">
-            <div className="flex h-full flex-col">
-              <NavItems />
-            </div>
-          </SheetContent>
-        </Sheet>
-      </div>
+    <div className="md:hidden">
+      <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        <SheetTrigger asChild>
+          <Button variant="ghost" size="icon" className="md:hidden">
+            <Menu className="h-6 w-6" />
+            <span className="sr-only">Открыть меню</span>
+          </Button>
+        </SheetTrigger>
+        <SheetContent side="left" className="w-64 p-0 bg-white dark:bg-slate-950">
+          <div className="flex h-full flex-col">
+            <NavItems setIsOpen={setIsOpen} />
+          </div>
+        </SheetContent>
+      </Sheet>
+    </div>
+  );
+}
 
-      {/* Десктопное меню */}
-      <div className="hidden md:flex h-full flex-col">
-        <NavItems />
-      </div>
+// Десктопная навигация
+function DesktopNav() {
+  return (
+    <div className="hidden md:flex h-full flex-col">
+      <NavItems />
+    </div>
+  );
+}
+
+export function Sidebar() {
+  return (
+    <>
+      <MobileNav />
+      <DesktopNav />
     </>
   );
 }

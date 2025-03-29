@@ -17,11 +17,18 @@
 
 image: node:18-alpine
 
+variables:
+  NODE_VERSION: '20.11.1'
+  LINEAR_ACCESS_TOKEN: ${LINEAR_ACCESS_TOKEN}
+
 stages:
-  - quick-lint
   - install
+  - lint
+  - type-check
   - build
+  - test
   - deploy
+  - notify
 
 cache:
   key: ${CI_COMMIT_REF_SLUG}
@@ -37,29 +44,37 @@ workflow:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - when: never
 
-# Быстрая проверка линтером при каждом пуше
-quick-lint:
-  stage: quick-lint
-  script:
-    - npm ci
-    - npm run lint
-  rules:
-    - when: always
-
 # Установка зависимостей
 install:
   stage: install
   script:
-    - npm ci
+    - npm install -g pnpm
+    - pnpm install --frozen-lockfile
   artifacts:
     paths:
       - node_modules/
+
+# Проверка линтером
+lint:
+  stage: lint
+  script:
+    - pnpm lint
+  dependencies:
+    - install
+
+# Проверка типов
+type-check:
+  stage: type-check
+  script:
+    - pnpm type-check
+  dependencies:
+    - install
 
 # Сборка проекта
 build:
   stage: build
   script:
-    - npm run build
+    - pnpm build
   artifacts:
     paths:
       - dist/
@@ -67,20 +82,36 @@ build:
   dependencies:
     - install
 
-# Деплой на Vercel
+# Тесты
+test:
+  stage: test
+  script:
+    - pnpm test
+  dependencies:
+    - install
+
+# Деплой
 deploy:
   stage: deploy
-  image: node:18-alpine
   script:
-    - npm install -g vercel
-    - vercel --token $VERCEL_TOKEN --prod
+    - echo "Deploy to production"
+  only:
+    - main
   dependencies:
     - build
-  rules:
-    - if: $CI_COMMIT_BRANCH == "main"
+
+# Уведомления
+notify:
+  stage: notify
+  script:
+    - echo "Notify about deployment"
+  only:
+    - main
+  dependencies:
+    - deploy
 
 # Уведомления в Slack
-notify:
+notify_slack:
   stage: .post
   script:
     - |

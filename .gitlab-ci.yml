@@ -79,8 +79,6 @@ workflow:
 # mirror-to-github:
 mirror-to-github:
   stage: mirror
-  variables:
-    GITHUB_TOKEN: ${GITHUB_TOKEN}
   script:
     - apk add --no-cache git
     - git config --global user.name "GitLab CI"
@@ -89,21 +87,13 @@ mirror-to-github:
       if [ -n "${GITHUB_TOKEN}" ]; then
         echo "Token is present"
         
-        # Настраиваем credentials helper
-        git config --global credential.helper store
-        echo "https://oauth2:${GITHUB_TOKEN}@github.com" > ~/.git-credentials
-        
         # Клонируем репозиторий
         git clone --mirror https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.com/dictionary-app-42/dict-fe.git
         cd dict-fe.git
         
-        # Добавляем GitHub remote и пушим
-        git remote add github "https://github.com/violetflash/dict.git"
-        git push -f github --all
-        git push -f github --tags
-        
-        # Очищаем credentials
-        rm ~/.git-credentials
+        # Пушим напрямую через URL с токеном
+        git push -f "https://oauth2:${GITHUB_TOKEN}@github.com/violetflash/dict.git" --all
+        git push -f "https://oauth2:${GITHUB_TOKEN}@github.com/violetflash/dict.git" --tags
       else
         echo "Error: GITHUB_TOKEN is not set"
         exit 1

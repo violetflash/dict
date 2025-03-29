@@ -14,7 +14,7 @@
 # - node_modules и .npm-cache кэшируются для ускорения сборок
 # - Ключ кэша зависит от ветки
 
-image: node:18-alpine
+image: node:20-alpine
 
 variables:
   NODE_VERSION: '20.11.1'
@@ -50,6 +50,7 @@ quick-lint:
     - npm install -g pnpm
     - pnpm install
     - pnpm run lint
+    - pnpm run type-check
 
 # Установка зависимостей
 install:

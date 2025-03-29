@@ -10,7 +10,7 @@ if [ "$BRANCH_NAME" = "main" ] || [ "$BRANCH_NAME" = "develop" ]; then
 fi
 
 # Проверяем формат имени ветки
-if ! echo "$BRANCH_NAME" | grep -qE '^(feature|bugfix|hotfix|release)/[a-z0-9-]+$|^rc-[0-9]+v$'; then
+if ! echo "$BRANCH_NAME" | grep -qE '^(feature|bugfix|hotfix|release)/[a-zA-Z0-9-]+$|^rc-[0-9]+v$'; then
   echo "❌ Неверный формат имени ветки: $BRANCH_NAME"
   echo "Используйте формат: type/description или rc-#v"
   echo "Типы: feature, bugfix, hotfix, release"

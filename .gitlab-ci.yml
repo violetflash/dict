@@ -6,9 +6,9 @@
 #    - Установка зависимостей
 #    - Сборка проекта
 #
-# 2. При создании/обновлении MR в main:
-#    - Все проверки как в develop
-#    - Деплой на Vercel (временно отключен)
+# 2. При создании/обновлении MR в develop:
+#    - Все проверки как при пуше
+#    - Синхронизация с GitHub
 #
 # Кэширование:
 # - node_modules и .npm-cache кэшируются для ускорения сборок
@@ -21,18 +21,17 @@ variables:
   LINEAR_ACCESS_TOKEN: ${LINEAR_ACCESS_TOKEN}
 
 stages:
-  # - quick-lint
-  # - install
-  # - build
+  - quick-lint
+  - install
+  - build
   - mirror # заливаем в github
   # - deploy
-  # - .post
 
-# cache:
-#   key: ${CI_COMMIT_REF_SLUG}
-#   paths:
-#     - node_modules/
-#     - .pnpm-store/
+cache:
+  key: ${CI_COMMIT_REF_SLUG}
+  paths:
+    - node_modules/
+    - .pnpm-store/
 
 # Правила запуска пайплайна
 workflow:
@@ -45,35 +44,35 @@ workflow:
     - when: never
 
 # Проверка линтером
-# quick-lint:
-#   stage: quick-lint
-#   script:
-#     - npm install -g pnpm
-#     - pnpm install
-#     - pnpm run lint
+quick-lint:
+  stage: quick-lint
+  script:
+    - npm install -g pnpm
+    - pnpm install
+    - pnpm run lint
 
 # Установка зависимостей
-# install:
-#   stage: install
-#   script:
-#     - npm install -g pnpm
-#     - pnpm install
-#   artifacts:
-#     paths:
-#       - node_modules/
+install:
+  stage: install
+  script:
+    - npm install -g pnpm
+    - pnpm install
+  artifacts:
+    paths:
+      - node_modules/
 
 # Сборка проекта
-# build:
-#   stage: build
-#   script:
-#     - npm install -g pnpm
-#     - pnpm run build
-#   artifacts:
-#     paths:
-#       - dist/
-#     expire_in: 1 week
-#   dependencies:
-#     - install
+build:
+  stage: build
+  script:
+    - npm install -g pnpm
+    - pnpm run build
+  artifacts:
+    paths:
+      - .next/
+    expire_in: 1 week
+  dependencies:
+    - install
 
 # Синхронизация с GitHub
 # mirror-to-github:
@@ -115,18 +114,5 @@ mirror-to-github:
 #     - vercel --token $VERCEL_TOKEN --prod
 #   dependencies:
 #     - build
-#   rules:
-#     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"
-
-# Уведомления в Slack (временно отключены)
-# notify:
-#   stage: .post
-#   script:
-#     - |
-#       if [ $CI_PIPELINE_STATUS = "success" ]; then
-#         curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"✅ Pipeline успешно выполнен в ветке $CI_COMMIT_BRANCH\"}" $SLACK_WEBHOOK_URL
-#       else
-#         curl -X POST -H 'Content-type: application/json' --data "{\"text\":\"❌ Pipeline завершился с ошибкой в ветке $CI_COMMIT_BRANCH\"}" $SLACK_WEBHOOK_URL
-#       fi
 #   rules:
 #     - if: $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"

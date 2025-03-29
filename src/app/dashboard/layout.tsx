@@ -12,12 +12,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
       <div className="flex flex-1">
         {/* Десктопный сайдбар */}
-        <aside className="hidden w-64 border-r bg-background md:block">
+        <aside className="hidden bg-background md:block">
           <Sidebar />
         </aside>
 
         {/* Основной контент */}
-        <main className="flex-1 overflow-y-auto px-5">
+        <main className="flex-1 grow overflow-y-auto px-5">
           <div className="container py-4">{children}</div>
         </main>
       </div>

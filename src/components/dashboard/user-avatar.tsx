@@ -28,9 +28,13 @@ export function UserAvatar({
           </AvatarFallback>
         </Avatar>
         {!hideText && (
-          <div className="flex flex-col">
-            <span className="text-sm font-medium">{user?.name || 'Пользователь'}</span>
-            <span className="text-xs text-muted-foreground">{user?.email}</span>
+          <div className="flex flex-col max-w-[100px]">
+            <span className="text-sm font-medium truncate" title={user?.name || 'Пользователь'}>
+              {user?.name || 'Пользователь'}
+            </span>
+            <span className="text-xs text-muted-foreground truncate" title={user?.email}>
+              {user?.email}
+            </span>
           </div>
         )}
       </div>

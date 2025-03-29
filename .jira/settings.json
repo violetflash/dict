@@ -1,0 +1,17 @@
+{
+  "projectKey": "DICT",
+  "projectName": "MyDictionary",
+  "issueTypes": {
+    "feature": "Task",
+    "bug": "Bug",
+    "enhancement": "Enhancement"
+  },
+  "statuses": {
+    "toDo": "To Do",
+    "inProgress": "In Progress",
+    "review": "In Review",
+    "done": "Done"
+  },
+  "branchTemplate": "{type}/{issueKey}-{title}",
+  "commitTemplate": "{type}: {title} {issueKey}"
+}

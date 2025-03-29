@@ -9,8 +9,7 @@ fi
 # Проверяем формат имени ветки
 if ! echo "$BRANCH_NAME" | grep -qE '^(feature|bugfix|hotfix|release)/[a-zA-Z0-9-]+$|^rc-[0-9]+v$'; then
   echo "❌ Неверный формат имени ветки: $BRANCH_NAME"
-  echo "Используйте формат: type/description или rc-#v"
-  echo "Типы: feature, bugfix, hotfix, release"
+  echo "Используйте формат: feature, bugfix, hotfix, release, rc-#v"
   echo "Примеры: feature/add-word-form, rc-1v"
   exit 1
 fi

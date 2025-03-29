@@ -24,11 +24,26 @@ export function useDevLink() {
   const isDevMode = process.env.NODE_ENV === 'development';
 
   const handleLink = (href: string) => {
-    if (isDevMode) {
-      const url = new URL(href, window.location.origin);
-      url.searchParams.set('dev-auth', 'true');
-      router.push(url.pathname + url.search);
-    } else {
+    try {
+      if (isDevMode) {
+        // Проверяем, является ли href абсолютным URL
+        const isAbsoluteUrl = href.startsWith('http://') || href.startsWith('https://');
+
+        if (isAbsoluteUrl) {
+          const url = new URL(href);
+          url.searchParams.set('dev-auth', 'true');
+          router.push(url.pathname + url.search);
+        } else {
+          // Для относительных путей
+          const searchParams = new URLSearchParams();
+          searchParams.set('dev-auth', 'true');
+          router.push(`${href}?${searchParams.toString()}`);
+        }
+      } else {
+        router.push(href);
+      }
+    } catch (error) {
+      // В случае ошибки просто переходим по ссылке
       router.push(href);
     }
   };

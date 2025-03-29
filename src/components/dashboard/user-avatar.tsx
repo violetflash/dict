@@ -4,7 +4,13 @@ import { LogOut, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDevLink } from '@/hooks/use-dev-link';
 
-export function UserAvatar({ hideText, showLogout }: { hideText?: boolean; showLogout?: boolean }) {
+export function UserAvatar({
+  hideText,
+  showLogout = true,
+}: {
+  hideText?: boolean;
+  showLogout?: boolean;
+}) {
   const { user, logout } = useAuthStore();
   const { handleLink } = useDevLink();
 

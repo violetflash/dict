@@ -4,7 +4,7 @@ import { LogOut, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useDevLink } from '@/hooks/use-dev-link';
 
-export function UserAvatar() {
+export function UserAvatar({ hideText, showLogout }: { hideText?: boolean; showLogout?: boolean }) {
   const { user, logout } = useAuthStore();
   const { handleLink } = useDevLink();
 
@@ -21,14 +21,18 @@ export function UserAvatar() {
             <User className="h-4 w-4" />
           </AvatarFallback>
         </Avatar>
-        <div className="flex flex-col">
-          <span className="text-sm font-medium">{user?.name || 'Пользователь'}</span>
-          <span className="text-xs text-muted-foreground">{user?.email}</span>
-        </div>
+        {!hideText && (
+          <div className="flex flex-col">
+            <span className="text-sm font-medium">{user?.name || 'Пользователь'}</span>
+            <span className="text-xs text-muted-foreground">{user?.email}</span>
+          </div>
+        )}
       </div>
-      <Button variant="ghost" size="icon" onClick={handleLogout}>
-        <LogOut className="h-4 w-4 cursor-pointer" />
-      </Button>
+      {showLogout && (
+        <Button variant="ghost" size="icon" onClick={handleLogout}>
+          <LogOut className="h-4 w-4 cursor-pointer" />
+        </Button>
+      )}
     </div>
   );
 }

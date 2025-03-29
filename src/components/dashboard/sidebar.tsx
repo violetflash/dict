@@ -1,5 +1,4 @@
 'use client';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import {
@@ -11,7 +10,6 @@ import {
   Menu,
   Settings,
   Trophy,
-  X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
@@ -36,7 +34,6 @@ const bottomNavigation = [
 export function Sidebar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
-  const { user } = useAuthStore();
   const { handleLink } = useDevLink();
 
   const NavItems = () => (

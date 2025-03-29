@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { AuthModal } from '@/components/auth/auth-modal';
 import { Skeleton } from '@/components/ui/skeleton';
-import Link from 'next/link';
 import { useAuthStore } from '@/store/auth-store';
 import { useDevLink } from '@/hooks/use-dev-link';
 interface HeroProps {

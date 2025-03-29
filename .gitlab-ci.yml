@@ -24,6 +24,7 @@ stages:
   - quick-lint
   - install
   - build
+  - mirror # заливаем в github
   # - deploy # Временно отключен
   # - .post # Временно отключен
 
@@ -74,6 +75,22 @@ build:
     expire_in: 1 week
   dependencies:
     - install
+
+    # Синхронизация с GitHub
+mirror-to-github:
+  stage: mirror
+  script:
+    - apt-get update && apt-get install -y git
+    # Настраиваем Git
+    - git config --global user.name "${GITLAB_USER_NAME}"
+    - git config --global user.email "${GITLAB_USER_EMAIL}"
+    # Добавляем GitHub remote и пушим изменения
+    - git remote add github https://${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}@https://github.com/violetflash/dict.git
+    - git push --mirror github
+  rules:
+    - if: $CI_COMMIT_BRANCH == "main" || $CI_COMMIT_BRANCH == "develop"
+      when: always
+    - when: never
 # Деплой на Vercel (временно отключен)
 # deploy:
 #   stage: deploy

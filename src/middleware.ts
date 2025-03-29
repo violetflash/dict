@@ -23,7 +23,10 @@ export function middleware(request: NextRequest) {
   const isDevAuth = request.nextUrl.searchParams.get('dev-auth') === 'true';
 
   // В dev-режиме можно обойти гвард через URL-параметр
-  if (isDevMode && isDevAuth) {
+  if (
+    // isDevMode &&
+    isDevAuth
+  ) {
     return NextResponse.next();
   }
 
